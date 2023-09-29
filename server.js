@@ -42,6 +42,19 @@ io.on("connection", (socket) => {
 
   console.log(`El cliente con IP: ${socket.handshake.address} se ha conectado`);
 
+  socket.on("register", (nickname) => {
+    if (list_users[nickname]) {
+      socket.emit("userExists");
+      return;
+    } else {
+      list_users[nickname] = socket.id;
+      socket.nickname = nickname;
+      socket.emit("login");
+      io.emit("activeSessions", list_users);
+    }
+  });
+
+
   // Emitir un mensaje cuando un usuario se conecta
   io.emit("sendMessage", {
     message: `${socket.nickname} se ha unido al chat`,
@@ -70,17 +83,6 @@ io.on("connection", (socket) => {
     user: "INFO",
   });
 
-  socket.on("register", (nickname) => {
-    if (list_users[nickname]) {
-      socket.emit("userExists");
-      return;
-    } else {
-      list_users[nickname] = socket.id;
-      socket.nickname = nickname;
-      socket.emit("login");
-      io.emit("activeSessions", list_users);
-    }
-  });
 
   socket.on("disconnect", () => {
     if (socket.nickname) {
