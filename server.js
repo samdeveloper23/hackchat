@@ -56,11 +56,12 @@ io.on("connection", (socket) => {
 
 
   // Emitir un mensaje cuando un usuario se conecta
-  io.emit("sendMessage", {
-    message: `${socket.nickname} se ha unido al chat`,
-    user: "System",
-  });
-
+  if (socket.nickname) {
+    io.emit("sendMessage", {
+      message: `${socket.nickname} se ha unido al chat`,
+      user: "System",
+    });
+  }
   // Registrar automáticamente al usuario "samvirtual"
   socket.emit("register", "Sam-virtualBot-EN");
   // Emitir un mensaje de bienvenida desde "samvirtual" a todos los usuarios

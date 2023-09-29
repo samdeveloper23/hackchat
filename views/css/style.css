@@ -305,7 +305,7 @@ section.body-chat
 	border-radius: 10px;
 	text-align: right;
 	font-size: 0.9em;
-	background:  #f505058e;
+	background:  #8b1e1e;
 }
 .message p:first-child:before
 {
@@ -338,7 +338,7 @@ section.body-chat
 .message.frnd_message p 
 {
 	text-align:left;
-	background:  #8b1e1e;
+	background:  #000000ce;
 	color: #2fe01f
 }
 .message.frnd_message p:first-child:before
