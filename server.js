@@ -38,15 +38,37 @@ app.get('/', (req, res, next) => {
   }
 });
 
-const message = [{
-  id: 0,
-  userMessage: 'Welcome to the chat, participate by starting a technological debate or following the one there is, thank you.',
-  userNickName: 'Sam-botVirtual-EN',
-}];
-
 io.on("connection", (socket) => {
+
   console.log(`El cliente con IP: ${socket.handshake.address} se ha conectado`);
-  socket.emit('messages', message);
+
+  // Emitir un mensaje cuando un usuario se conecta
+  io.emit("sendMessage", {
+    message: `${socket.nickname} se ha unido al chat`,
+    user: "System",
+  });
+
+  // Registrar automáticamente al usuario "samvirtual"
+  socket.emit("register", "Sam-virtualBot-EN");
+  // Emitir un mensaje de bienvenida desde "samvirtual" a todos los usuarios
+  socket.emit("sendMessage", {
+    message: "Welcome to the chat, participate by starting a technological debate or following the one there is, thank you.",
+    user: "Sam-virtualBot-EN",
+  });
+
+  socket.emit("register", "Sam-virtualBot-ES");
+  // Emitir un mensaje de bienvenida desde "samvirtual" a todos los usuarios
+  socket.emit("sendMessage", {
+    message: "Bienvenido al chat, participa iniciando un debate tecnológico o siguiendo el que haya, gracias.",
+    user: "Sam-virtualBot-ES",
+  });
+
+  socket.emit("register", "INFO");
+  // Emitir un mensaje de bienvenida desde "samvirtual" a todos los usuarios
+  socket.emit("sendMessage", {
+    message: "SE INFORMA: esta App es solo de pruebas, el objetivo es mejorar el servidor y la App, ahora mismo se esta trabajando con la DB, gracias.",
+    user: "INFO",
+  });
 
   socket.on("register", (nickname) => {
     if (list_users[nickname]) {
@@ -61,8 +83,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    delete list_users[socket.nickname];
-    io.emit("activeSessions", list_users);
+    if (socket.nickname) {
+      // Emitir un mensaje cuando un usuario se desconecta
+      io.emit("sendMessage", {
+        message: `${socket.nickname} se ha desconectado`,
+        user: "System",
+      });
+
+      delete list_users[socket.nickname];
+      io.emit("activeSessions", list_users);
+    }
   });
 
   socket.on("sendMessage", ({ message, image }) => {
