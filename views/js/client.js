@@ -1,5 +1,5 @@
 const socket = io.connect('http://eva00.sytes.net', { 'forceNew': true });
-
+//http://192.168.1.44:6677
 let fileURL;
 
 //  Formularios

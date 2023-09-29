@@ -1,18 +1,53 @@
-const express = require("express");
-const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server);
-const path = require("path");
-const PORT = process.env.PORT || 6677;
+const http = require('http');
+const express = require('express');
+const socketIo = require('socket.io');
+const morgan = require('morgan');
+const colors = require('colors');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const path = require('path');
+const PORT = 6677;
 const list_users = {};
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+const corsOptions = {
+  origin: 'http://eva00.sytes.net',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions)); // Aplica CORS a tu aplicación Express
+
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(fileUpload());
 
 app.use(express.static(path.join(__dirname, "views")));
 
-server.listen(PORT, () => {
-  console.log(`Server listen: ${PORT}`);
+app.get('/', (req, res, next) => {
+  try {
+    const filePath = path.join(__dirname, 'views/index.html');
+    res.sendFile(filePath);
+
+  } catch (error) {
+    next(error);
+  }
 });
 
+const message = [{
+  id: 0,
+  userMessage: 'Welcome to the chat, participate by starting a technological debate or following the one there is, thank you.',
+  userNickName: 'Sam-botVirtual-EN',
+}];
+
 io.on("connection", (socket) => {
+  console.log(`El cliente con IP: ${socket.handshake.address} se ha conectado`);
+  socket.emit('messages', message);
+
   socket.on("register", (nickname) => {
     if (list_users[nickname]) {
       socket.emit("userExists");
@@ -50,4 +85,8 @@ io.on("connection", (socket) => {
       alert("El usuario al que intentas enviar el mensaje no existe!");
     }
   });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server listen: ${PORT}`);
 });
